@@ -1,0 +1,29 @@
+{
+  "_note": "共用預設。自己的私事清單寫在同資料夾的 config.local.json（格式相同、只寫要覆蓋的欄位），不會進 git，更新 skill 時不會被蓋掉。personal_* 只影響「抽哪些對話當案例」，不影響計數。",
+  "personal_scheduled_tasks": [],
+  "personal_keywords": [],
+  "personal_paths": [],
+  "exception_keywords": [
+    "額度",
+    "門檻",
+    "403",
+    "改走",
+    "改用",
+    "備援",
+    "等您",
+    "同意後",
+    "核對同意",
+    "跳過",
+    "中止",
+    "失敗",
+    "未完成",
+    "沒有開工",
+    "需要人工核准",
+    "不覆寫",
+    "沒有覆寫"
+  ],
+  "schedule_check_tool": "",
+  "weekly_metrics_csv": "",
+  "automation_cases": 5,
+  "automation_cases_per_task": 2
+}
