@@ -1,6 +1,6 @@
 # AI 健檢報告（ai-usage-report）
 
-讓你的 Claude 讀你自己電腦上跟它的對話紀錄，寫一份「你是怎麼用 AI 的」報告：
+讓你的 Claude 或 Codex 讀你自己電腦上的 AI 對話紀錄，寫一份「你是怎麼用 AI 的」報告：
 
 - 你用 AI 用到第幾級（LV0～LV5，從「一問一答」到「讓它每天自己跑」）
 - 你是 16 種使用風格裡的哪一型
@@ -11,34 +11,40 @@
 
 ## 安裝
 
-打開 Claude 桌面 App 的 Code 分頁（或 Claude Code），貼上這段話：
+Claude（桌面 App 的 Code 分頁或 Claude Code）和 Codex（App 或 CLI）都能用。打開你平常用的那一個，貼上這段話：
 
 ```text
 請幫我安裝這個 skill：https://github.com/yoyo8462/ai-usage-report
 先讀 repo 裡的 INSTALL.md，照步驟做。每一步先跟我說要做什麼，我說好再做。
 ```
 
-裝好之後跟 Claude 說「分析我怎麼用 AI」，就會產出報告。之後要更新，說「更新 AI 健檢 skill」。
+兩個都用的話，裝一次就好：它會下載一份放在家目錄，再連到 Claude 和 Codex 兩邊。
+
+裝好之後說「分析我怎麼用 AI」，就會產出報告。之後要更新，說「更新 AI 健檢 skill」。
 
 自己動手裝（Windows PowerShell）：
 
 ```powershell
-git clone https://github.com/yoyo8462/ai-usage-report.git "$env:USERPROFILE\.claude\skills\ai-usage-report"
+git clone https://github.com/yoyo8462/ai-usage-report.git "$env:USERPROFILE\ai-usage-report"
+New-Item -ItemType Junction -Path "$env:USERPROFILE\.claude\skills\ai-usage-report" -Target "$env:USERPROFILE\ai-usage-report"   # Claude
+New-Item -ItemType Junction -Path "$env:USERPROFILE\.codex\skills\ai-usage-report" -Target "$env:USERPROFILE\ai-usage-report"    # Codex
 ```
 
 Mac／Linux：
 
 ```bash
-git clone https://github.com/yoyo8462/ai-usage-report.git ~/.claude/skills/ai-usage-report
+git clone https://github.com/yoyo8462/ai-usage-report.git ~/ai-usage-report
+mkdir -p ~/.claude/skills && ln -s ~/ai-usage-report ~/.claude/skills/ai-usage-report   # Claude
+mkdir -p ~/.codex/skills && ln -s ~/ai-usage-report ~/.codex/skills/ai-usage-report     # Codex
 ```
 
 需要 Python 3（Windows 指令是 `python`，Mac 是 `python3`）。
 
 ## 先知道的事
 
-- 只讀這台電腦上 Claude Code 的對話（含桌面 App 的 Code 分頁），也讀得到 Codex。網頁版 Claude、ChatGPT、手機 App 的對話讀不到。
+- 只讀這台電腦上 Claude Code（含桌面 App 的 Code 分頁）與 Codex 的對話；不管從哪一邊跑，兩邊的紀錄都會一起讀。網頁版 Claude、ChatGPT、手機 App 的對話讀不到。
 - 全部在你的電腦上跑，不上傳任何東西。要把報告給別人看之前，先自己看一遍，裡面可能有你打過的原句。
-- 安裝時 Claude 會問你哪些主題是私事，存在 `config.local.json`，那些對話不會被挑成案例；這個檔不進 git，更新時不會被蓋掉。
+- 安裝時 AI 會問你哪些主題是私事，存在 `config.local.json`，那些對話不會被挑成案例；這個檔不進 git，更新時不會被蓋掉。
 - 用不到一個月、對話很少的話，報告會很短，這是正常的。
 - 等級和風格不是分數，也不是考績；這個 skill 刻意不做排名。
 
@@ -56,6 +62,7 @@ git clone https://github.com/yoyo8462/ai-usage-report.git ~/.claude/skills/ai-us
 | 私人對話可能被抽成案例 | 依 `config.local.json` 的私事清單排除 |
 | — | 報告開頭和上一次比較（`報告紀錄.json`） |
 | 部分寫法只在 Mac 能跑 | Windows 與 Mac 都能跑（排程設定位置、日期格式、主控台編碼） |
+| Claude、Codex 各自安裝 | 下載一份放家目錄，兩邊用連結共用；說明文字不綁定某一家 AI |
 
 ## 授權
 

@@ -1,10 +1,6 @@
 ---
 name: ai-usage-report
-description: |
-  AI 使用能力報告（AI 健檢）：讀這台電腦上 Claude Code（桌面 App 的 Code 分頁）留下的真實對話紀錄，產出有證據、可追溯的單檔 HTML 報告：
-  LV0–LV5 使用等級、四項系統驗證、16 型人物志分型、工作系統、值得固定下來的做法，並和上一次報告比較。
-  使用者說「分析我怎麼用 AI」「幫我做 AI 健檢」「AI 幾級了」「我是哪一型的 AI 使用者」「跑這個月的 AI 使用報告」時使用。
-  不做排名、不做考績。
+description: AI 使用能力報告（AI 健檢）：讀這台電腦上 Claude Code（含桌面 App 的 Code 分頁）與 Codex 留下的真實對話紀錄，產出有證據、可追溯的單檔 HTML 報告：LV0–LV5 使用等級、四項系統驗證、16 型人物志分型、工作系統、值得固定下來的做法，並和上一次報告比較。使用者說「分析我怎麼用 AI」「幫我做 AI 健檢」「AI 幾級了」「我是哪一型的 AI 使用者」「跑這個月的 AI 使用報告」時使用。不做排名、不做考績。Claude 與 Codex 都能用。
 ---
 
 # AI 使用能力報告（AI 健檢）
@@ -27,20 +23,22 @@ description: |
 ## 第 0 步：先問三件事（一次問完，等回覆）
 
 1. 只分析這台電腦上「使用者本人」的紀錄，對嗎？（不能拿來分析別人的電腦）
-2. 報告裡要不要放你打過的原句摘錄？要的話證據包只放在這次對話的暫存區（scratchpad）；不要就加 `--no-content`。
+2. 報告裡要不要放你打過的原句摘錄？要的話證據包只放在暫存資料夾；不要就加 `--no-content`。
 3. 報告要給誰看？只給自己／給別人看。給別人看的版本一律 `--no-content`，交出去前請使用者自己看過每個案例。
 
 期間預設 30 天，使用者有指定就照他的。
 
 ## 第 1 步：產出證據包
 
-Windows 用 `python`，Mac 用 `python3`。skill 裝在別的位置就換成實際路徑：
+程式在這個 skill 資料夾的 `scripts/collect.py`（通常是 `~/ai-usage-report`，或 `~/.claude/skills/ai-usage-report`、`~/.codex/skills/ai-usage-report`，以你實際讀到這份 SKILL.md 的位置為準）。Windows 用 `python`，Mac 用 `python3`：
 
 ```
-python -I ~/.claude/skills/ai-usage-report/scripts/collect.py --days 30 --out <scratchpad>/evidence
+python -I <skill 資料夾>/scripts/collect.py --days 30 --out <暫存資料夾>/evidence
 ```
 
-（Windows 用 PowerShell 跑時，路徑寫 `"$env:USERPROFILE\.claude\skills\ai-usage-report\scripts\collect.py"`；Mac 把 `python` 換成 `python3`。）
+暫存資料夾：Claude 有這次對話的 scratchpad 就用它；Codex 或沒有 scratchpad 時，用系統暫存（Windows `$env:TEMP`，Mac `$TMPDIR`），不要放進使用者的工作資料夾或任何 git repo。
+
+不管你是 Claude 還是 Codex，程式都會同時讀 `~/.claude` 與 `~/.codex` 兩邊的紀錄（有裝才讀）。Codex 在沙盒裡跑時讀取家目錄一般不受限；如果被擋，請使用者核准這一次執行。
 
 跑完讀三個檔：`summary.json`（計數）、`metrics.md`（同一份計數的可讀版）、`cases.md`（抽樣案例）。
 
@@ -50,10 +48,12 @@ python -I ~/.claude/skills/ai-usage-report/scripts/collect.py --days 30 --out <s
 |---|---|
 | 本人操作 | 不是下面三種的對話 |
 | 排程自動執行 | 第一則訊息是 `<scheduled-task name="…">`；跑完後使用者接著打的字另計 `scheduled_followup_messages` |
-| AI 驅動 agent | Codex 的 `codex_exec`（從別的 AI 對話叫起來的） |
-| 子代理 | `.claude/projects/*/<對話>/subagents/*.jsonl` |
+| AI 驅動 agent | Codex 的 `codex exec`（從別的 AI 對話或程式叫起來的） |
+| 子代理 | Claude 的 `.claude/projects/*/<對話>/subagents/*.jsonl`；Codex 依 `thread_source` 判斷 |
 
-`summary.json` 另有 `automation_breakdown`（排程與 AI 驅動拆開）、`schedule_runs`（排程該跑沒跑；沒用排程會寫「略過」，正常）。
+`summary.json` 另有 `automation_breakdown`（排程與 AI 驅動拆開）、`schedule_runs`（Claude 桌面 App 的排程該跑沒跑；沒用排程會寫「略過」，正常）。Codex 的自動化目前只認 `codex exec`。
+
+報告開頭要寫清楚兩邊各讀到幾則：只讀到 Codex 就說只讀到 Codex。本人操作同時出現在 Claude 與 Codex，是 LV5「多棲」的線索（見 `references/levels.md`）。
 
 自己另外寫程式分析紀錄時，時間戳一律先轉本機時間再取日期（紀錄裡是 UTC，早上 8 點前的事會被算到前一天）。
 
